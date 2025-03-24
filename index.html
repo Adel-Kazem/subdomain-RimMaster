@@ -5,93 +5,169 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RimMaster - Premium Wheels & Rims</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="products.js"></script>
 </head>
 <body class="bg-gray-100 font-sans" x-data="{
-    cartOpen: false,
-    cartItems: [],
+    isOpen: false,
+    scrollToTop() {
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    },
     products: PRODUCTS,
-    searchQuery: '',
-    addToCart(product) {
-        this.cartItems.push(product);
-    },
-    removeFromCart(index) {
-        this.cartItems.splice(index, 1);
-    },
-    filteredProducts() {
+    searchTerm: '',
+    cart: [],
+    showCart: false,
+
+    get filteredProducts() {
         return this.products.filter(product =>
-            product.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-            product.description.toLowerCase().includes(this.searchQuery.toLowerCase())
+            product.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+            product.description.toLowerCase().includes(this.searchTerm.toLowerCase())
         );
+    },
+
+    addToCart(product) {
+        const existingItem = this.cart.find(item => item.id === product.id);
+        if (existingItem) {
+            existingItem.quantity += 1;
+        } else {
+            this.cart.push({...product, quantity: 1});
+        }
+    },
+
+    removeFromCart(productId) {
+        this.cart = this.cart.filter(item => item.id !== productId);
+    },
+
+    get cartTotal() {
+        return this.cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
+    },
+
+    get cartCount() {
+        return this.cart.reduce((count, item) => count + item.quantity, 0);
     }
 }">
 
 <!-- SVG Sprites -->
 <svg xmlns="http://www.w3.org/2000/svg" class="hidden">
-    <symbol id="cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="9" cy="21" r="1"></circle>
-        <circle cx="20" cy="21" r="1"></circle>
-        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+    <symbol id="icon-star" viewBox="0 0 24 24">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
     </symbol>
-    <symbol id="whatsapp-icon" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+    <symbol id="icon-cart" viewBox="0 0 24 24">
+        <path d="M9 22a1 1 0 100-2 1 1 0 000 2zm6 0a1 1 0 100-2 1 1 0 000 2zM3 3h2l.5 2h15a.5.5 0 01.5.5c0 .1 0 .2-.1.3l-3 6a.5.5 0 01-.4.2H7.5L7 14h12v2H7a1 1 0 01-1-1V4H3V3z"></path>
     </symbol>
-    <symbol id="arrow-up-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="12" y1="19" x2="12" y2="5"></line>
-        <polyline points="5 12 12 5 19 12"></polyline>
+    <symbol id="icon-whatsapp" viewBox="0 0 24 24">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"></path>
+    </symbol>
+    <symbol id="icon-arrow-up" viewBox="0 0 24 24">
+        <path d="M12 2l-8 8h5v12h6V10h5l-8-8z"></path>
+    </symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24">
+        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
     </symbol>
 </svg>
 
 <!-- Header -->
-<header id="header" class="bg-white shadow-md">
-    <div class="container mx-auto px-4 py-6 flex justify-between items-center">
-        <h1 id="logo" class="text-3xl font-bold text-gray-800">Rim<span class="text-red-500">Master</span></h1>
-        <nav>
-            <ul class="flex space-x-6">
-                <li><a id="nav-home" href="#home" class="text-gray-600 hover:text-gray-800">Home</a></li>
-                <li><a id="nav-products" href="#products" class="text-gray-600 hover:text-gray-800">Products</a></li>
-                <li><a id="nav-contact" href="#contact" class="text-gray-600 hover:text-gray-800">Contact</a></li>
+<header id="header-section" class="bg-white shadow-md sticky top-0 z-50">
+    <div id="header-container" class="container mx-auto px-4 py-4">
+        <div id="header-content" class="flex justify-between items-center">
+            <div id="logo-container" class="flex items-center">
+                <h1 id="logo-text" class="text-3xl font-bold">
+                    Rim<span id="logo-highlight" class="text-red-600">Master</span></h1>
+            </div>
+
+            <nav id="main-nav" class="hidden md:block">
+                <ul id="nav-list" class="flex space-x-8">
+                    <li id="nav-item-1">
+                        <a id="nav-link-1" href="#home-section" class="text-gray-800 hover:text-red-600 transition">Home</a>
+                    </li>
+                    <li id="nav-item-2">
+                        <a id="nav-link-2" href="#products-section" class="text-gray-800 hover:text-red-600 transition">Products</a>
+                    </li>
+                    <li id="nav-item-3">
+                        <a id="nav-link-3" href="#contact-section" class="text-gray-800 hover:text-red-600 transition">Contact</a>
+                    </li>
+                </ul>
+            </nav>
+
+            <button id="mobile-menu-button" class="md:hidden text-gray-800" @click="isOpen = !isOpen">
+                <svg id="menu-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden" x-show="isOpen" x-transition>
+            <ul id="mobile-nav-list" class="mt-4 space-y-4">
+                <li id="mobile-nav-item-1">
+                    <a id="mobile-nav-link-1" href="#home-section" class="block text-gray-800 hover:text-red-600 transition" @click="isOpen = false">Home</a>
+                </li>
+                <li id="mobile-nav-item-2">
+                    <a id="mobile-nav-link-2" href="#products-section" class="block text-gray-800 hover:text-red-600 transition" @click="isOpen = false">Products</a>
+                </li>
+                <li id="mobile-nav-item-3">
+                    <a id="mobile-nav-link-3" href="#contact-section" class="block text-gray-800 hover:text-red-600 transition" @click="isOpen = false">Contact</a>
+                </li>
             </ul>
-        </nav>
+        </div>
     </div>
 </header>
 
 <!-- Home Section -->
-<section id="home" class="py-20 bg-gray-800 text-white">
-    <div class="container mx-auto px-4 text-center">
-        <h2 id="home-heading" class="text-4xl font-bold mb-4">Welcome to RimMaster</h2>
-        <p id="home-description" class="text-xl mb-8">Elevate your vehicle's performance and style with our premium collection of wheels and rims.</p>
-        <a id="home-cta" href="#products" class="bg-red-500 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-red-600 transition duration-300">Shop Now</a>
+<section id="home-section" class="py-20 bg-gradient-to-r from-gray-900 to-gray-800 text-white">
+    <div id="home-container" class="container mx-auto px-4">
+        <div id="home-content" class="max-w-3xl mx-auto text-center">
+            <h2 id="home-heading" class="text-5xl font-bold mb-6">Premium Wheels & Rims</h2>
+            <p id="home-subheading" class="text-xl mb-8">Transform your vehicle with our exclusive collection of
+                high-quality wheels and rims</p>
+            <a id="home-cta-button" href="#products-section" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full transition inline-block">Explore
+                Collection</a>
+        </div>
     </div>
 </section>
 
 <!-- Products Section -->
-<section id="products" class="py-20">
-    <div class="container mx-auto px-4">
-        <h2 id="products-heading" class="text-3xl font-bold text-center mb-12">Our Products</h2>
+<section id="products-section" class="py-16 bg-white">
+    <div id="products-container" class="container mx-auto px-4">
+        <h2 id="products-heading" class="text-4xl font-bold text-center mb-12">Our Products</h2>
 
         <!-- Search Bar -->
-        <div class="mb-8">
-            <input
-                    id="search-input"
-                    type="text"
-                    x-model="searchQuery"
-                    placeholder="Search products..."
-                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500"
-            >
+        <div id="search-container" class="max-w-md mx-auto mb-10">
+            <div id="search-input-container" class="relative">
+                <svg class="w-5 h-5 absolute left-3 top-3 text-gray-400">
+                    <use href="#icon-search"></use>
+                </svg>
+                <input
+                        id="search-input"
+                        type="text"
+                        x-model="searchTerm"
+                        placeholder="Search products..."
+                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+                >
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <template x-for="product in filteredProducts()" :key="product.id">
-                <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                    <img x-bind:src="product.image || 'https://via.placeholder.com/300x200'" x-bind:alt="product.name" class="w-full h-48 object-cover">
+        <!-- Products Grid -->
+        <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <template x-for="product in filteredProducts" :key="product.id">
+                <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 transition hover:shadow-lg">
+                    <img :src="product.image" :alt="product.name" class="w-full h-64 object-cover">
                     <div class="p-6">
-                        <h3 x-text="product.name" class="text-xl font-semibold mb-2"></h3>
-                        <p x-text="product.description" class="text-gray-600 mb-4"></p>
+                        <h3 class="text-xl font-bold mb-2" x-text="product.name"></h3>
+                        <div class="flex mb-2">
+                            <template x-for="i in 5" :key="i">
+                                <svg class="w-5 h-5" :class="i <= product.rating ? 'text-yellow-500' : 'text-gray-300'">
+                                    <use href="#icon-star"></use>
+                                </svg>
+                            </template>
+                        </div>
+                        <p class="text-gray-700 mb-4" x-text="product.description"></p>
                         <div class="flex justify-between items-center">
-                            <span x-text="'$' + product.price.toFixed(2)" class="text-lg font-bold"></span>
-                            <button @click="addToCart(product)" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300">
+                            <span class="text-xl font-bold text-red-600" x-text="`$${product.price.toFixed(2)}`"></span>
+                            <button
+                                    @click="addToCart(product)"
+                                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition"
+                            >
                                 Add to Cart
                             </button>
                         </div>
@@ -99,78 +175,302 @@
                 </div>
             </template>
         </div>
+
+        <!-- No Results Message -->
+        <div id="no-results-container" x-show="filteredProducts.length === 0" class="text-center py-10">
+            <p id="no-results-text" class="text-xl text-gray-600">No products found matching your search.</p>
+        </div>
     </div>
 </section>
 
 <!-- Contact Section -->
-<section id="contact" class="py-20 bg-gray-100">
-    <div class="container mx-auto px-4">
-        <h2 id="contact-heading" class="text-3xl font-bold text-center mb-12">Contact Us</h2>
-        <div class="max-w-lg mx-auto">
-            <form>
-                <div class="mb-4">
-                    <label for="name" class="block text-gray-700 font-bold mb-2">Name</label>
-                    <input type="text" id="name" name="name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" required>
+<section id="contact-section" class="py-16 bg-gray-100">
+    <div id="contact-container" class="container mx-auto px-4">
+        <h2 id="contact-heading" class="text-4xl font-bold text-center mb-12">Contact Us</h2>
+
+        <div id="contact-content" class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div id="contact-info-container">
+                <h3 id="contact-info-heading" class="text-2xl font-bold mb-4">Get In Touch</h3>
+                <p id="contact-info-text" class="text-gray-700 mb-6">Have questions about our products or need
+                    assistance? Reach out to us!</p>
+
+                <div id="contact-details-container" class="space-y-4">
+                    <div id="contact-address-container" class="flex items-start">
+                        <div id="contact-address-icon" class="w-6 h-6 text-red-600 mr-3 mt-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                        </div>
+                        <div id="contact-address-text">
+                            <h4 id="contact-address-label" class="font-bold">Address</h4>
+                            <p id="contact-address-value" class="text-gray-700">123 Wheel Street, Automotive District,
+                                CA 90210</p>
+                        </div>
+                    </div>
+
+                    <div id="contact-phone-container" class="flex items-start">
+                        <div id="contact-phone-icon" class="w-6 h-6 text-red-600 mr-3 mt-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                            </svg>
+                        </div>
+                        <div id="contact-phone-text">
+                            <h4 id="contact-phone-label" class="font-bold">Phone</h4>
+                            <p id="contact-phone-value" class="text-gray-700">(555) 123-4567</p>
+                        </div>
+                    </div>
+                    <div id="contact-email-container" class="flex items-start">
+                        <div id="contact-email-icon" class="w-6 h-6 text-red-600 mr-3 mt-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <div id="contact-email-text"><h4 id="contact-email-label" class="font-bold">Email</h4>
+                            <p id="contact-email-value" class="text-gray-700">info@rimmaster.com</p></div>
+                    </div>
+                                        <div id="contact-hours-container" class="flex items-start">
+                        <div id="contact-hours-icon" class="w-6 h-6 text-red-600 mr-3 mt-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div id="contact-hours-text">
+                            <h4 id="contact-hours-label" class="font-bold">Business Hours</h4>
+                            <p id="contact-hours-value" class="text-gray-700">Monday-Friday: 9AM-6PM<br>Saturday:
+                                10AM-4PM<br>Sunday: Closed</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-4">
-                    <label for="email" class="block text-gray-700 font-bold mb-2">Email</label>
-                    <input type="email" id="email" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" required>
-                </div>
-                <div class="mb-4">
-                    <label for="message" class="block text-gray-700 font-bold mb-2">Message</label>
-                    <textarea id="message" name="message" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" required></textarea>
-                </div>
-                <button type="submit" class="w-full bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">Send Message</button>
-            </form>
+            </div>
+
+            <div id="contact-form-container">
+                <h3 id="contact-form-heading" class="text-2xl font-bold mb-4">Send Us a Message</h3>
+                <form id="contact-form" class="space-y-4">
+                    <div id="form-name-container">
+                        <label id="form-name-label" for="name" class="block text-gray-700 mb-1">Name</label>
+                        <input id="form-name-input" type="text" name="name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600">
+                    </div>
+
+                    <div id="form-email-container">
+                        <label id="form-email-label" for="email" class="block text-gray-700 mb-1">Email</label>
+                        <input id="form-email-input" type="email" name="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600">
+                    </div>
+
+                    <div id="form-message-container">
+                        <label id="form-message-label" for="message" class="block text-gray-700 mb-1">Message</label>
+                        <textarea id="form-message-input" name="message" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"></textarea>
+                    </div>
+
+                    <button id="form-submit-button" type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg transition">
+                        Send Message
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </section>
 
 <!-- Footer -->
-<footer id="footer" class="bg-gray-800 text-white py-8">
-    <div class="container mx-auto px-4 text-center">
-        <p id="footer-text">Website designed with ♥ by DV Team</p>
+<footer id="footer-section" class="bg-gray-900 text-white py-8">
+    <div id="footer-container" class="container mx-auto px-4">
+        <div id="footer-content" class="flex flex-col md:flex-row justify-between items-center">
+            <div id="footer-logo-container">
+                <h2 id="footer-logo-text" class="text-2xl font-bold">
+                    Rim<span id="footer-logo-highlight" class="text-red-600">Master</span></h2>
+            </div>
+
+            <div id="footer-links-container" class="my-4 md:my-0">
+                <ul id="footer-links-list" class="flex space-x-6">
+                    <li id="footer-link-item-1">
+                        <a id="footer-link-1" href="#home-section" class="hover:text-red-600 transition">Home</a></li>
+                    <li id="footer-link-item-2">
+                        <a id="footer-link-2" href="#products-section" class="hover:text-red-600 transition">Products</a>
+                    </li>
+                    <li id="footer-link-item-3">
+                        <a id="footer-link-3" href="#contact-section" class="hover:text-red-600 transition">Contact</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div id="footer-social-container" class="flex space-x-4">
+                <a id="footer-social-1" href="#" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-red-600 transition">
+                    <svg id="footer-social-icon-1" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                    </svg>
+                </a>
+                <a id="footer-social-2" href="#" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-red-600 transition">
+                    <svg id="footer-social-icon-2" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/>
+                    </svg>
+                </a>
+                <a id="footer-social-3" href="#" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-red-600 transition">
+                    <svg id="footer-social-icon-3" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+
+        <div id="footer-copyright-container" class="mt-6 text-center">
+            <p id="footer-copyright-text" class="text-gray-400">© 2025 RimMaster. All rights reserved.</p>
+            <p id="footer-credit-text" class="text-gray-500 mt-2">Website designed with ♥ by DV Team</p>
+        </div>
     </div>
 </footer>
 
-<!-- WhatsApp Icon -->
-<a href="https://wa.me/1234567890" target="_blank" class="fixed bottom-4 right-4 bg-green-500 text-white p-3 rounded-full shadow-lg hover:bg-green-600 transition duration-300">
-    <svg class="w-6 h-6"><use href="#whatsapp-icon"></use></svg>
-</a>
+<!-- Cart Sidebar -->
+<div id="cart-sidebar"
+     x-show="showCart"
+     @click.away="showCart = false"
+     x-transition:enter="transition ease-out duration-300"
+     x-transition:enter-start="opacity-0 transform translate-x-full"
+     x-transition:enter-end="opacity-100 transform translate-x-0"
+     x-transition:leave="transition ease-in duration-300"
+     x-transition:leave-start="opacity-100 transform translate-x-0"
+     x-transition:leave-end="opacity-0 transform translate-x-full"
+     class="fixed top-0 right-0 h-full w-full sm:w-96 bg-white shadow-xl z-50 overflow-y-auto">
 
-<!-- Go Up Button -->
-<button id="go-up-button" @click="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-4 left-4 bg-gray-800 text-white p-3 rounded-full shadow-lg hover:bg-gray-700 transition duration-300">
-    <svg class="w-6 h-6"><use href="#arrow-up-icon"></use></svg>
-</button>
+    <div id="cart-header" class="p-4 bg-gray-900 text-white flex justify-between items-center">
+        <h3 id="cart-title" class="text-xl font-bold">Your Cart</h3>
+        <button id="cart-close-button" @click="showCart = false" class="text-white hover:text-red-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+    </div>
 
-<!-- Cart Icon -->
-<div x-show="cartItems.length > 0" @click="cartOpen = true" class="fixed top-1/2 right-4 transform -translate-y-1/2 bg-red-500 text-white p-3 rounded-full shadow-lg hover:bg-red-600 transition duration-300 cursor-pointer">
-    <svg class="w-6 h-6"><use href="#cart-icon"></use></svg>
-    <span x-text="cartItems.length" class="absolute -top-2 -right-2 bg-white text-red-500 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold"></span>
-</div>
-
-<!-- Cart Modal -->
-<div x-show="cartOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white p-8 rounded-lg max-w-md w-full">
-        <h3 id="cart-heading" class="text-2xl font-bold mb-4">Your Cart</h3>
-        <ul>
-            <template x-for="(item, index) in cartItems" :key="index">
-                <li class="flex justify-between items-center mb-2">
-                    <span x-text="item.name"></span>
-                    <div>
-                        <span x-text="'$' + item.price.toFixed(2)" class="mr-2"></span>
-                        <button @click="removeFromCart(index)" class="text-red-500 hover:text-red-700">Remove</button>
-                    </div>
-                </li>
-            </template>
-        </ul>
-        <div class="mt-4 flex justify-between items-center">
-            <span class="font-bold">Total:</span>
-            <span x-text="'$' + cartItems.reduce((sum, item) => sum + item.price, 0).toFixed(2)" class="font-bold"></span>
+    <div id="cart-content" class="p-4">
+        <div id="cart-empty-message" x-show="cart.length === 0" class="text-center py-8">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            <p id="cart-empty-text" class="mt-4 text-gray-600">Your cart is empty</p>
         </div>
-        <button @click="cartOpen = false" class="mt-6 w-full bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">Close</button>
+
+        <div id="cart-items-container" x-show="cart.length > 0">
+            <ul id="cart-items-list" class="divide-y divide-gray-200">
+                <template x-for="item in cart" :key="item.id">
+                    <li class="py-4 flex">
+                        <img :src="item.image" :alt="item.name" class="h-20 w-20 rounded-md object-cover">
+                        <div class="ml-4 flex-1">
+                            <div class="flex justify-between">
+                                <h4 class="text-sm font-medium" x-text="item.name"></h4>
+                                <button @click="removeFromCart(item.id)" class="text-red-500 hover:text-red-700">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="flex justify-between mt-2">
+                                <div class="flex items-center">
+                                    <span class="text-gray-600 mr-3">Qty:</span>
+                                    <span class="text-gray-800" x-text="item.quantity"></span>
+                                </div>
+                                <span class="font-medium" x-text="`$${(item.price * item.quantity).toFixed(2)}`"></span>
+                            </div>
+                        </div>
+                    </li>
+                </template>
+            </ul>
+
+            <div id="cart-total-container" class="mt-6 pt-4 border-t border-gray-200">
+                <div id="cart-subtotal" class="flex justify-between">
+                    <span id="cart-subtotal-label" class="text-gray-600">Subtotal</span>
+                    <span id="cart-subtotal-value" class="font-medium" x-text="`$${cartTotal}`"></span>
+                </div>
+                <p id="cart-shipping-text" class="text-gray-500 text-sm mt-1">Shipping and taxes calculated at
+                    checkout</p>
+            </div>
+
+            <button id="cart-checkout-button" class="mt-6 w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition">
+                Proceed to Checkout
+            </button>
+        </div>
     </div>
 </div>
 
+<!-- Cart Icon Button -->
+<div id="cart-button-container"
+     x-show="cart.length > 0"
+     @click="showCart = true"
+     class="fixed right-6 top-1/2 transform -translate-y-1/2 z-40 cursor-pointer">
+    <div id="cart-button" class="bg-red-600 hover:bg-red-700 text-white rounded-full p-3 shadow-lg transition relative">
+        <svg class="w-6 h-6">
+            <use href="#icon-cart"></use>
+        </svg>
+        <span id="cart-count" class="absolute -top-2 -right-2 bg-white text-red-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold" x-text="cartCount"></span>
+    </div>
+</div>
+
+<!-- WhatsApp Button -->
+<a id="whatsapp-button" href="https://wa.me/11234567890" target="_blank" class="fixed right-6 bottom-6 z-40">
+    <div id="whatsapp-icon-container" class="bg-green-500 hover:bg-green-600 text-white rounded-full p-3 shadow-lg transition">
+        <svg class="w-6 h-6">
+            <use href="#icon-whatsapp"></use>
+        </svg>
+    </div>
+</a>
+
+<!-- Go Up Button -->
+<button id="go-up-button" @click="scrollToTop" class="fixed left-6 bottom-6 z-40 bg-gray-800 hover:bg-gray-700 text-white rounded-full p-3 shadow-lg transition" x-show="window.pageYOffset > 100">
+    <svg class="w-6 h-6">
+        <use href="#icon-arrow-up"></use>
+    </svg>
+</button>
+
+<script>
+    // AlpineJS initialization
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('products', () => ({
+            products: PRODUCTS,
+            searchTerm: '',
+            cart: [],
+            showCart: false,
+
+            get filteredProducts() {
+                return this.products.filter(product =>
+                    product.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+                    product.description.toLowerCase().includes(this.searchTerm.toLowerCase())
+                );
+            },
+
+            addToCart(product) {
+                const existingItem = this.cart.find(item => item.id === product.id);
+                if (existingItem) {
+                    existingItem.quantity += 1;
+                } else {
+                    this.cart.push({...product, quantity: 1});
+                }
+            },
+
+            removeFromCart(productId) {
+                this.cart = this.cart.filter(item => item.id !== productId);
+            },
+
+            get cartTotal() {
+                return this.cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
+            },
+
+            get cartCount() {
+                return this.cart.reduce((count, item) => count + item.quantity, 0);
+            },
+
+            scrollToTop() {
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            }
+        }))
+    })
+
+    // Scroll event listener for "Go Up" button visibility
+    window.addEventListener('scroll', () => {
+        const goUpButton = document.getElementById('go-up-button');
+        if (window.pageYOffset > 100) {
+            goUpButton.classList.remove('hidden');
+        } else {
+            goUpButton.classList.add('hidden');
+        }
+    });
+</script>
 </body>
 </html>
