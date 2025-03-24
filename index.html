@@ -18,28 +18,28 @@
 <body class="bg-gray-50 font-sans" x-data="{ cartOpen: false, scrollToTop() { window.scrollTo({top: 0, behavior: 'smooth'}); }, cart: [], searchQuery: '', products: PRODUCTS, addToCart(product) { const existingItem = this.cart.find(item => item.id === product.id); if (existingItem) { existingItem.quantity += 1; } else { this.cart.push({...product, quantity: 1}); } this.cartOpen = true; setTimeout(() => { this.cartOpen = false; }, 3000); }, removeFromCart(productId) { this.cart = this.cart.filter(item => item.id !== productId); }, updateQuantity(productId, newQuantity) { const item = this.cart.find(item => item.id === productId); if (item) { item.quantity = Math.max(1, newQuantity); } }, get cartTotal() { return this.cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2); }, get cartCount() { return this.cart.reduce((count, item) => count + item.quantity, 0); }, get filteredProducts() { return this.products.filter(product => product.name.toLowerCase().includes(this.searchQuery.toLowerCase()) || (product.description && product.description.toLowerCase().includes(this.searchQuery.toLowerCase())) ); } }">
 <!-- SVG Sprites -->
 <svg xmlns="http://www.w3.org/2000/svg" class="hidden">
-    <symbol id="icon-cart" viewBox="0 0 24 24">
-        <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <symbol id="icon-cart" viewbox="0 0 24 24">
+        <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
     </symbol>
-    <symbol id="icon-whatsapp" viewBox="0 0 24 24">
-        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" fill="currentColor"/>
+    <symbol id="icon-whatsapp" viewbox="0 0 24 24">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" fill="currentColor"></path>
     </symbol>
-    <symbol id="icon-arrow-up" viewBox="0 0 24 24">
-        <path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <symbol id="icon-arrow-up" viewbox="0 0 24 24">
+        <path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
     </symbol>
-    <symbol id="icon-star" viewBox="0 0 24 24">
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <symbol id="icon-star" viewbox="0 0 24 24">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
     </symbol>
-    <symbol id="icon-star-empty" viewBox="0 0 24 24">
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <symbol id="icon-star-empty" viewbox="0 0 24 24">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
     </symbol>
-    <symbol id="icon-search" viewBox="0 0 24 24">
-        <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <symbol id="icon-search" viewbox="0 0 24 24">
+        <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
     </symbol>
-    <symbol id="icon-wheel" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
-        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
-        <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12" stroke="currentColor" stroke-width="2"/>
+    <symbol id="icon-wheel" viewbox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"></circle>
+        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"></circle>
+        <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12" stroke="currentColor" stroke-width="2"></path>
     </symbol>
 </svg>
 
@@ -52,7 +52,8 @@
                     <use href="#icon-wheel"></use>
                 </svg>
                 <h1 id="logo-text" class="text-3xl font-bold">
-                    Rim<span id="logo-highlight" class="text-red-500">Master</span></h1>
+                    Rim<span id="logo-highlight" class="text-red-500">Master</span>
+</h1>
             </div>
             <nav id="main-nav" class="flex space-x-6">
                 <a id="nav-link-home" href="#hero-section" class="hover:text-red-400 transition">Home</a>
@@ -91,13 +92,7 @@
                 <svg class="w-5 h-5 text-gray-400 absolute left-3 top-3">
                     <use href="#icon-search"></use>
                 </svg>
-                <input
-                        id="search-input"
-                        type="text"
-                        x-model="searchQuery"
-                        placeholder="Search products..."
-                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500"
-                >
+                <input id="search-input" type="text" x-model="searchQuery" placeholder="Search products..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500">
             </div>
         </div>
 
@@ -106,11 +101,7 @@
             <template x-for="product in filteredProducts" :key="product.id">
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition duration-300">
                     <div class="h-48 bg-gray-200 overflow-hidden">
-                        <img
-                                x-bind:src="product.image || 'https://via.placeholder.com/400x300?text=No+Image'"
-                                x-bind:alt="product.name"
-                                class="w-full h-full object-cover"
-                        >
+                        <img x-bind:src="product.image || 'https://via.placeholder.com/400x300?text=No+Image'" x-bind:alt="product.name" class="w-full h-full object-cover">
                     </div>
                     <div class="p-6">
                         <div class="flex justify-between items-start mb-2">
@@ -125,10 +116,7 @@
                             </template>
                         </div>
                         <p class="text-gray-600 mb-4" x-text="product.description"></p>
-                        <button
-                                @click="addToCart(product)"
-                                class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition duration-300"
-                        >
+                        <button @click="addToCart(product)" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition duration-300">
                             Add to Cart
                         </button>
                     </div>
@@ -210,7 +198,7 @@
                         <h4 id="about-contact-hours-heading" class="font-bold text-gray-800 mb-2">Business Hours</h4>
                         <div id="about-contact-hours-list" class="text-gray-700">
                             <span id="about-contact-hours-weekday" class="block">Monday-Friday: 9AM-6PM</span>
-                            <span id="about-contact-hours-saturday" class="block">Saturday: 10AM-4PM</span>
+                            <span id="about-contact-hours-saturday" class="block">Saturday: 10AM-7PM</span>
                             <span id="about-contact-hours-sunday" class="block">Sunday: Closed</span>
                         </div>
                     </div>
@@ -219,7 +207,8 @@
                         <div id="about-contact-address-details" class="text-gray-700">
                             <span id="about-contact-address-street" class="block">123 Wheel Street</span>
                             <span id="about-contact-address-city" class="block">Rimville, CA 90210</span>
-                            <span id="about-contact-address-phone" class="block">Phone: (555) 123-4567</span></div>
+                            <span id="about-contact-address-phone" class="block">Phone: (555) 123-4567</span>
+</div>
                     </div>
                 </div>
             </div>
