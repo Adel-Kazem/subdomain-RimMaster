@@ -38,5 +38,13 @@ const PRODUCTS = [
     price: 219.99,
     rating: 3,
     image: null
+  },
+  {
+    id: 7,
+    name: "testtttttttttttt",
+    description: "Officiis sint verita",
+    price: 43,
+    image: "https://raw.githubusercontent.com/Adel-Kazem/subdomain-RimMaster/main/products_images/Belts-Style-Image-4.jpg",
+    rating: 5
   }
 ];
