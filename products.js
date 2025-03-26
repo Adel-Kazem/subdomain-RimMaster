@@ -46,5 +46,17 @@ const PRODUCTS = [
     price: 43,
     image: "https://raw.githubusercontent.com/Adel-Kazem/subdomain-RimMaster/main/products_images/Belts-Style-Image-4.jpg",
     rating: 5
+  },
+  {
+    id: 8,
+    name: "Placeat et velit ve",
+    description: "Excepteur sed sint s",
+    price: 40,
+    images: [
+      "https://raw.githubusercontent.com/Adel-Kazem/subdomain-RimMaster/main/products_images/Allen-Edmonds-Bombay-Dress-Belt.jpg",
+      "https://raw.githubusercontent.com/Adel-Kazem/subdomain-RimMaster/main/products_images/Allen-Edmonds-Carlyle-Plain-Toe-Oxfords.jpg",
+      "https://raw.githubusercontent.com/Adel-Kazem/subdomain-RimMaster/main/products_images/Allen-Edmonds-Newland-Ave-dresscasual-belt.jpg"
+    ],
+    rating: 5
   }
 ];
