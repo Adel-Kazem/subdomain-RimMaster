@@ -1,12 +1,12 @@
 <?php
 // Configuration
 //$componentsDirectory = 'js'; // Relative path within the repository
-$componentsDirectory = ''; // Relative path within the repository
+$componentsDirectory = 'C:\xampp\htdocs\subdomain-RimMaster\js'; // Relative path within the repository
 $outputFile = 'Components_content.txt';
 
 // Files to exclude
 $excludeFiles = [
-//    'products.js',
+    'products.js',
     'categories.js',
     // Add more files to exclude as needed
 ];
@@ -22,14 +22,12 @@ $filteredComponentPaths = array_filter($componentPaths, function($path) use ($ex
 
 // Add additional files manually
 $additionalFiles = [
-//    'C:\xampp\htdocs\subdomain-WristRest\index.html',
-//    'C:\xampp\htdocs\subdomain-WristRest\cart.html',
-    'C:\xampp\htdocs\subdomain-WristRest\product.html',
-    'C:\xampp\htdocs\subdomain-WristRest\sitemap.xml',
-    'C:\xampp\htdocs\subdomain-WristRest\js\products.js',
-//    'C:\xampp\htdocs\subdomain-WristRest\products.html',
-//    'C:\xampp\htdocs\subdomain-WristRest\js\products.js',
-//    'C:\xampp\htdocs\subdomain-WristRest\sitemap-generator.html',
+    'C:\xampp\htdocs\subdomain-RimMaster\index.html',
+//    'C:\xampp\htdocs\subdomain-RimMaster\cart.html',
+//    'C:\xampp\htdocs\subdomain-RimMaster\js\products.js',
+//    'C:\xampp\htdocs\subdomain-RimMaster\products.html',
+//    'C:\xampp\htdocs\subdomain-RimMaster\js\products.js',
+//    'C:\xampp\htdocs\subdomain-RimMaster\sitemap-generator.html',
     // Your additional files here
 ];
 
